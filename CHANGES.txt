@@ -17,6 +17,10 @@ Altoholic_Grids\Grid_Reputation.lua:
 	FIXED:		use new MapIDs
 	ADDED:		Legion Fishing Master reputations
 	
+Altoholic_Grids\Grid_Sets.lua:
+	ADDED:		Battle for Azeroth sets
+	ENHANCED:	raid sets with no tier (ToV, all BfA raids) will now show their difficulty without a bogus tier placeholder
+	
 Altoholic_Search\TabSearch.xml:
 	FIXED:		character level search boxes now accept three-digit values
 	
