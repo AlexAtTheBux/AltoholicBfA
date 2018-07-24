@@ -7,10 +7,10 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local MODE_SUMMARY = 1
 local MODE_BAGS = 2
---local MODE_SKILLS = 3
-local MODE_ACTIVITY = 3
-local MODE_CURRENCIES = 4
-local MODE_FOLLOWERS = 5
+local MODE_SKILLS = 3
+local MODE_ACTIVITY = 4
+local MODE_CURRENCIES = 5
+local MODE_FOLLOWERS = 6
 --local MODE_ARTIFACT = 7
 
 local SKILL_CAP = 800
@@ -117,116 +117,114 @@ local function FormatAiL(level)
 	return format("%s%s %s%s", colors.yellow, L["COLUMN_ILEVEL_TITLE_SHORT"], colors.green, level)
 end
 
---local skillColors = { colors.recipeGrey, colors.red, colors.orange, colors.yellow, colors.green }
+local skillColors = { colors.recipeGrey, colors.red, colors.orange, colors.yellow, colors.green }
 
---local function GetSkillRankColor(rank, skillCap)
---	rank = rank or 0
---	skillCap = skillCap or SKILL_CAP
---	return skillColors[ floor(rank / (skillCap/4)) + 1 ]
---end
+local function GetSkillRankColor(rank, skillCap)
+	rank = rank or 0
+	skillCap = skillCap or SKILL_CAP
+	return skillColors[ floor(rank / (skillCap/4)) + 1 ]
+end
 
---local function TradeskillHeader_OnEnter(frame, tooltip)
---	tooltip:AddLine(" ")
---	tooltip:AddLine(format("%s%s|r %s %s", colors.recipeGrey, L["COLOR_GREY"], L["up to"], (floor(SKILL_CAP*0.25)-1)),1,1,1)
---	tooltip:AddLine(format("%s%s|r %s %s", colors.red, RED_GEM, L["up to"], (floor(SKILL_CAP*0.50)-1)),1,1,1)
---	tooltip:AddLine(format("%s%s|r %s %s", colors.orange, L["COLOR_ORANGE"], L["up to"], (floor(SKILL_CAP*0.75)-1)),1,1,1)
---	tooltip:AddLine(format("%s%s|r %s %s", colors.yellow, YELLOW_GEM, L["up to"], (SKILL_CAP-1)),1,1,1)
---	tooltip:AddLine(format("%s%s|r %s %s %s", colors.green, L["COLOR_GREEN"], L["at"], SKILL_CAP, L["and above"]),1,1,1)
---end
+local function TradeskillHeader_OnEnter(frame, tooltip)
+	tooltip:AddLine(" ")
+	tooltip:AddLine(format("%s%s|r %s %s", colors.recipeGrey, L["COLOR_GREY"], L["up to"], (floor(SKILL_CAP*0.25)-1)),1,1,1)
+	tooltip:AddLine(format("%s%s|r %s %s", colors.red, RED_GEM, L["up to"], (floor(SKILL_CAP*0.50)-1)),1,1,1)
+	tooltip:AddLine(format("%s%s|r %s %s", colors.orange, L["COLOR_ORANGE"], L["up to"], (floor(SKILL_CAP*0.75)-1)),1,1,1)
+	tooltip:AddLine(format("%s%s|r %s %s", colors.yellow, YELLOW_GEM, L["up to"], (SKILL_CAP-1)),1,1,1)
+	tooltip:AddLine(format("%s%s|r %s %s %s", colors.green, L["COLOR_GREEN"], L["at"], SKILL_CAP, L["and above"]),1,1,1)
+end
 
---local function Tradeskill_OnEnter(frame, skillName, showRecipeStats)
---	local character = frame:GetParent().character
---	if not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
+local function Tradeskill_OnEnter(frame, skillName, showRecipeStats)
+	local character = frame:GetParent().character
+	if not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
 	
---	local curRank, maxRank = DataStore:GetProfessionInfo(DataStore:GetProfession(character, skillName))
---	local profession = DataStore:GetProfession(character, skillName)
+	local curRank, maxRank = DataStore:GetProfessionInfo(DataStore:GetProfession(character, skillName))
+	local profession = DataStore:GetProfession(character, skillName)
 
---	local tt = AltoTooltip
+	local tt = AltoTooltip
 	
---	tt:ClearLines()
---	tt:SetOwner(frame, "ANCHOR_RIGHT")
---	tt:AddLine(skillName,1,1,1)
---	tt:AddLine(format("%s%s/%s", GetSkillRankColor(curRank), curRank, maxRank),1,1,1)
+	tt:ClearLines()
+	tt:SetOwner(frame, "ANCHOR_RIGHT")
+	tt:AddLine(skillName,1,1,1)
+	tt:AddLine(format("%s%s/%s", GetSkillRankColor(curRank), curRank, maxRank),1,1,1)
 	
---	if showRecipeStats then	-- for primary skills + cooking
---		if DataStore:GetProfessionSpellID(skillName) ~= 2366 and skillName ~= GetSpellInfo(8613) then		-- no display for herbalism & skinning
---			tt:AddLine(" ")
+	if showRecipeStats then	-- for primary skills + cooking & first aid
+		if DataStore:GetProfessionSpellID(skillName) ~= 2366 and skillName ~= GetSpellInfo(8613) then		-- no display for herbalism & skinning
+			tt:AddLine(" ")
 			
---			if not profession then
---				tt:AddLine(L["No data"])
---				tt:Show()
---				return
---			end
-      
-      
+			if not profession then
+				tt:AddLine(L["No data"])
+				tt:Show()
+				return
+			end
 		
---			if DataStore:GetNumCraftLines(profession) == 0 then
---				tt:AddLine(format("%s: 0 %s", L["No data"], TRADESKILL_SERVICE_LEARN),1,1,1)
---			else
---				local orange, yellow, green, grey = DataStore:GetNumRecipesByColor(profession)
+			if DataStore:GetNumCraftLines(profession) == 0 then
+				tt:AddLine(format("%s: 0 %s", L["No data"], TRADESKILL_SERVICE_LEARN),1,1,1)
+			else
+				local orange, yellow, green, grey = DataStore:GetNumRecipesByColor(profession)
 				
---				tt:AddLine(orange+yellow+green+grey .. " " .. TRADESKILL_SERVICE_LEARN,1,1,1)
---				tt:AddLine(format("%s%d %s%s|r / %s%d %s%s|r / %s%d %s%s",
---					colors.white, green, colors.recipeGreen, L["COLOR_GREEN"],
---					colors.white, yellow, colors.yellow, L["COLOR_YELLOW"],
---					colors.white, orange, colors.recipeOrange, L["COLOR_ORANGE"]))
---			end
---		end
---	end
+				tt:AddLine(orange+yellow+green+grey .. " " .. TRADESKILL_SERVICE_LEARN,1,1,1)
+				tt:AddLine(format("%s%d %s%s|r / %s%d %s%s|r / %s%d %s%s",
+					colors.white, green, colors.recipeGreen, L["COLOR_GREEN"],
+					colors.white, yellow, colors.yellow, L["COLOR_YELLOW"],
+					colors.white, orange, colors.recipeOrange, L["COLOR_ORANGE"]))
+			end
+		end
+	end
 
-----	local suggestion = addon:GetSuggestion(skillName, curRank)
-----	if suggestion then
-----		tt:AddLine(" ")
-----		tt:AddLine(format("%s: ", L["Suggestion"]),1,1,1)
-----		tt:AddLine(format("%s%s", colors.teal, suggestion),1,1,1)
-----	end
+	local suggestion = addon:GetSuggestion(skillName, curRank)
+	if suggestion then
+		tt:AddLine(" ")
+		tt:AddLine(format("%s: ", L["Suggestion"]),1,1,1)
+		tt:AddLine(format("%s%s", colors.teal, suggestion),1,1,1)
+	end
 	
---	-- parse profession cooldowns
---	if profession then
---		DataStore:ClearExpiredCooldowns(profession)
---		local numCooldows = DataStore:GetNumActiveCooldowns(profession)
+	-- parse profession cooldowns
+	if profession then
+		DataStore:ClearExpiredCooldowns(profession)
+		local numCooldows = DataStore:GetNumActiveCooldowns(profession)
 		
---		if numCooldows == 0 then
---			tt:AddLine(" ")
---			tt:AddLine(L["All cooldowns are up"],1,1,1)
---		else
---			tt:AddLine(" ")
---			for i = 1, numCooldows do
---				local craftName, expiresIn = DataStore:GetCraftCooldownInfo(profession, i)
---				tt:AddDoubleLine(craftName, addon:GetTimeString(expiresIn))
---			end
---		end
---	end
+		if numCooldows == 0 then
+			tt:AddLine(" ")
+			tt:AddLine(L["All cooldowns are up"],1,1,1)
+		else
+			tt:AddLine(" ")
+			for i = 1, numCooldows do
+				local craftName, expiresIn = DataStore:GetCraftCooldownInfo(profession, i)
+				tt:AddDoubleLine(craftName, addon:GetTimeString(expiresIn))
+			end
+		end
+	end
 	
---	tt:Show()
---end
+	tt:Show()
+end
 
---local function Tradeskill_OnClick(frame, skillName)
---	local character = frame:GetParent().character
---	if not skillName or not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
+local function Tradeskill_OnClick(frame, skillName)
+	local character = frame:GetParent().character
+	if not skillName or not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
 
---	local profession = DataStore:GetProfession(character, skillName)
---	if not profession or DataStore:GetNumCraftLines(profession) == 0 then		-- if profession hasn't been scanned (or scan failed), exit
---		return
---	end
+	local profession = DataStore:GetProfession(character, skillName)
+	if not profession or DataStore:GetNumCraftLines(profession) == 0 then		-- if profession hasn't been scanned (or scan failed), exit
+		return
+	end
 	
---	local charName, realm, account = strsplit(".", character)
---	local chat = ChatEdit_GetLastActiveWindow()
+	local charName, realm, account = strsplit(".", character)
+	local chat = ChatEdit_GetLastActiveWindow()
 	
---	if chat:IsShown() and IsShiftKeyDown() and realm == GetRealmName() then
---		-- if shift-click, then display the profession link and exit
---		local link = profession.FullLink	
---		if link and link:match("trade:") then
---			chat:Insert(link);
---		end
---		return
---	end
+	if chat:IsShown() and IsShiftKeyDown() and realm == GetRealmName() then
+		-- if shift-click, then display the profession link and exit
+		local link = profession.FullLink	
+		if link and link:match("trade:") then
+			chat:Insert(link);
+		end
+		return
+	end
 
---	addon.Tabs:OnClick("Characters")
---	addon.Tabs.Characters:SetAltKey(character)
---	addon.Tabs.Characters:MenuItem_OnClick(AltoholicTabCharacters.Characters, "LeftButton")
---	addon.Tabs.Characters:SetCurrentProfession(skillName)
---end
+	addon.Tabs:OnClick("Characters")
+	addon.Tabs.Characters:SetAltKey(character)
+	addon.Tabs.Characters:MenuItem_OnClick(AltoholicTabCharacters.Characters, "LeftButton")
+	addon.Tabs.Characters:SetCurrentProfession(skillName)
+end
 
 local function CurrencyHeader_OnEnter(frame, currencyID)
 	local tt = AltoTooltip
@@ -482,12 +480,12 @@ columns["Name"] = {
 				tt:AddLine(format("%s: %s%s", GUILD, colors.green, guildName),1,1,1)
 			end
 
---			local suggestion = addon:GetSuggestion("Leveling", DataStore:GetCharacterLevel(character))
---			if suggestion then
---				tt:AddLine(" ")
---				tt:AddLine(L["Suggested leveling zone: "],1,1,1)
---				tt:AddLine(colors.teal .. suggestion,1,1,1)
---			end
+			local suggestion = addon:GetSuggestion("Leveling", DataStore:GetCharacterLevel(character))
+			if suggestion then
+				tt:AddLine(" ")
+				tt:AddLine(L["Suggested leveling zone: "],1,1,1)
+				tt:AddLine(colors.teal .. suggestion,1,1,1)
+			end
 
 			-- parse saved instances
 			local bLineBreak = true
@@ -982,139 +980,139 @@ columns["FreeReagentBankSlots"] = {	-- TO DO
 		end,
 }
 
----- ** Skills **
---columns["Prof1"] = {
---	-- Header
---	headerWidth = 70,
---	headerLabel = L["COLUMN_PROFESSION_1_TITLE_SHORT"],
---	tooltipTitle = L["COLUMN_PROFESSION_1_TITLE"],
---	tooltipSubTitle = nil,
---	headerOnEnter = TradeskillHeader_OnEnter,
---	headerOnClick = function() SortView("Prof1") end,
---	headerSort = DataStore.GetProfession1,
+-- ** Skills **
+columns["Prof1"] = {
+	-- Header
+	headerWidth = 70,
+	headerLabel = L["COLUMN_PROFESSION_1_TITLE_SHORT"],
+	tooltipTitle = L["COLUMN_PROFESSION_1_TITLE"],
+	tooltipSubTitle = nil,
+	headerOnEnter = TradeskillHeader_OnEnter,
+	headerOnClick = function() SortView("Prof1") end,
+	headerSort = DataStore.GetProfession1,
 	
---	-- Content
---	Width = 70,
---	JustifyH = "CENTER",
---	GetText = function(character)
---			local rank, _, _, name = DataStore:GetProfession1(character)
---			local spellID = DataStore:GetProfessionSpellID(name)
---			local icon = spellID and format(TEXTURE_FONT, addon:GetSpellIcon(spellID), 18, 18) .. " " or ""
+	-- Content
+	Width = 70,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local rank, _, _, name = DataStore:GetProfession1(character)
+			local spellID = DataStore:GetProfessionSpellID(name)
+			local icon = spellID and format(TEXTURE_FONT, addon:GetSpellIcon(spellID), 18, 18) .. " " or ""
 			
---			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
---		end,
---	OnEnter = function(frame)
---			local character = frame:GetParent().character
---			local _, _, _, skillName = DataStore:GetProfession1(character)
---			Tradeskill_OnEnter(frame, skillName, true)
---		end,
---	OnClick = function(frame, button)
---			local character = frame:GetParent().character
---			local _, _, _, skillName = DataStore:GetProfession1(character)
---			Tradeskill_OnClick(frame, skillName)
---		end,
---}
+			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
+		end,
+	OnEnter = function(frame)
+			local character = frame:GetParent().character
+			local _, _, _, skillName = DataStore:GetProfession1(character)
+			Tradeskill_OnEnter(frame, skillName, true)
+		end,
+	OnClick = function(frame, button)
+			local character = frame:GetParent().character
+			local _, _, _, skillName = DataStore:GetProfession1(character)
+			Tradeskill_OnClick(frame, skillName)
+		end,
+}
 
---columns["Prof2"] = {
---	-- Header
---	headerWidth = 70,
---	headerLabel = L["COLUMN_PROFESSION_2_TITLE_SHORT"],
---	tooltipTitle = L["COLUMN_PROFESSION_2_TITLE"],
---	tooltipSubTitle = nil,
---	headerOnEnter = TradeskillHeader_OnEnter,
---	headerOnClick = function() SortView("Prof2") end,
---	headerSort = DataStore.GetProfession2,
+columns["Prof2"] = {
+	-- Header
+	headerWidth = 70,
+	headerLabel = L["COLUMN_PROFESSION_2_TITLE_SHORT"],
+	tooltipTitle = L["COLUMN_PROFESSION_2_TITLE"],
+	tooltipSubTitle = nil,
+	headerOnEnter = TradeskillHeader_OnEnter,
+	headerOnClick = function() SortView("Prof2") end,
+	headerSort = DataStore.GetProfession2,
 	
---	-- Content
---	Width = 70,
---	JustifyH = "CENTER",
---	GetText = function(character)
---			local rank, _, _, name = DataStore:GetProfession2(character)
---			local spellID = DataStore:GetProfessionSpellID(name)
---			local icon = spellID and format(TEXTURE_FONT, addon:GetSpellIcon(spellID), 18, 18) .. " " or ""
+	-- Content
+	Width = 70,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local rank, _, _, name = DataStore:GetProfession2(character)
+			local spellID = DataStore:GetProfessionSpellID(name)
+			local icon = spellID and format(TEXTURE_FONT, addon:GetSpellIcon(spellID), 18, 18) .. " " or ""
 			
---			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
---		end,
---	OnEnter = function(frame)
---			local character = frame:GetParent().character
---			local _, _, _, skillName = DataStore:GetProfession2(character)
---			Tradeskill_OnEnter(frame, skillName, true)
---		end,
---	OnClick = function(frame, button)
---			local character = frame:GetParent().character
---			local _, _, _, skillName = DataStore:GetProfession2(character)
---			Tradeskill_OnClick(frame, skillName)
---		end,
---}
+			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
+		end,
+	OnEnter = function(frame)
+			local character = frame:GetParent().character
+			local _, _, _, skillName = DataStore:GetProfession2(character)
+			Tradeskill_OnEnter(frame, skillName, true)
+		end,
+	OnClick = function(frame, button)
+			local character = frame:GetParent().character
+			local _, _, _, skillName = DataStore:GetProfession2(character)
+			Tradeskill_OnClick(frame, skillName)
+		end,
+}
 
---columns["ProfCooking"] = {
---	-- Header
---	headerWidth = 60,
---	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(2550), 18, 18),
---	tooltipTitle = GetSpellInfo(2550),
---	tooltipSubTitle = nil,
---	headerOnEnter = TradeskillHeader_OnEnter,
---	headerOnClick = function() SortView("ProfCooking") end,
---	headerSort = DataStore.GetCookingRank,
+columns["ProfCooking"] = {
+	-- Header
+	headerWidth = 60,
+	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(2550), 18, 18),
+	tooltipTitle = GetSpellInfo(2550),
+	tooltipSubTitle = nil,
+	headerOnEnter = TradeskillHeader_OnEnter,
+	headerOnClick = function() SortView("ProfCooking") end,
+	headerSort = DataStore.GetCookingRank,
 	
---	-- Content
---	Width = 60,
---	JustifyH = "CENTER",
---	GetText = function(character)
---			local rank = DataStore:GetCookingRank(character)
---			return format("%s%s", GetSkillRankColor(rank), rank)
---		end,
---	OnEnter = function(frame)
---			Tradeskill_OnEnter(frame, GetSpellInfo(2550), true)
---		end,
---	OnClick = function(frame, button)
---			Tradeskill_OnClick(frame, GetSpellInfo(2550))
---		end,
---}
+	-- Content
+	Width = 60,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local rank = DataStore:GetCookingRank(character)
+			return format("%s%s", GetSkillRankColor(rank), rank)
+		end,
+	OnEnter = function(frame)
+			Tradeskill_OnEnter(frame, GetSpellInfo(2550), true)
+		end,
+	OnClick = function(frame, button)
+			Tradeskill_OnClick(frame, GetSpellInfo(2550))
+		end,
+}
 
---columns["ProfFishing"] = {
---	-- Header
---	headerWidth = 60,
---	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(131474), 18, 18),
---	tooltipTitle = GetSpellInfo(131474),
---	tooltipSubTitle = nil,
---	headerOnEnter = TradeskillHeader_OnEnter,
---	headerOnClick = function() SortView("ProfFishing") end,
---	headerSort = DataStore.GetFishingRank,
+columns["ProfFishing"] = {
+	-- Header
+	headerWidth = 60,
+	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(131474), 18, 18),
+	tooltipTitle = GetSpellInfo(131474),
+	tooltipSubTitle = nil,
+	headerOnEnter = TradeskillHeader_OnEnter,
+	headerOnClick = function() SortView("ProfFishing") end,
+	headerSort = DataStore.GetFishingRank,
 	
---	-- Content
---	Width = 60,
---	JustifyH = "CENTER",
---	GetText = function(character)
---			local rank = DataStore:GetFishingRank(character)
---			return format("%s%s", GetSkillRankColor(rank), rank)
---		end,
---	OnEnter = function(frame)
---			Tradeskill_OnEnter(frame, GetSpellInfo(131474))
---		end,
---}
+	-- Content
+	Width = 60,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local rank = DataStore:GetFishingRank(character)
+			return format("%s%s", GetSkillRankColor(rank), rank)
+		end,
+	OnEnter = function(frame)
+			Tradeskill_OnEnter(frame, GetSpellInfo(131474))
+		end,
+}
 
---columns["ProfArchaeology"] = {
---	-- Header
---	headerWidth = 60,
---	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(78670), 18, 18),
---	tooltipTitle = GetSpellInfo(78670),
---	tooltipSubTitle = nil,
---	headerOnEnter = TradeskillHeader_OnEnter,
---	headerOnClick = function() SortView("ProfArchaeology") end,
---	headerSort = DataStore.GetArchaeologyRank,
+columns["ProfArchaeology"] = {
+	-- Header
+	headerWidth = 60,
+	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(78670), 18, 18),
+	tooltipTitle = GetSpellInfo(78670),
+	tooltipSubTitle = nil,
+	headerOnEnter = TradeskillHeader_OnEnter,
+	headerOnClick = function() SortView("ProfArchaeology") end,
+	headerSort = DataStore.GetArchaeologyRank,
 	
---	-- Content
---	Width = 60,
---	JustifyH = "CENTER",
---	GetText = function(character)
---			local rank = DataStore:GetArchaeologyRank(character)
---			return format("%s%s", GetSkillRankColor(rank), rank)
---		end,
---	OnEnter = function(frame)
---			Tradeskill_OnEnter(frame, GetSpellInfo(78670))
---		end,
---}
+	-- Content
+	Width = 60,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local rank = DataStore:GetArchaeologyRank(character)
+			return format("%s%s", GetSkillRankColor(rank), rank)
+		end,
+	OnEnter = function(frame)
+			Tradeskill_OnEnter(frame, GetSpellInfo(78670))
+		end,
+}
 
 -- ** Activity **
 columns["Mails"] = {
@@ -1471,6 +1469,131 @@ columns["MissionTableLastVisit"] = {
 
 
 -- ** Currencies **
+--[[ Old: Garrison Resources
+columns["CurrencyGarrison"] = {
+	-- Header
+	headerWidth = 80,
+	headerLabel = format("  %s  6.0", format(TEXTURE_FONT, "Interface\\Icons\\inv_garrison_resource", 18, 18)),
+	headerOnEnter = function(frame, tooltip)
+			CurrencyHeader_OnEnter(frame, CURRENCY_ID_GARRISON)
+		end,
+	headerOnClick = function() SortView("CurrencyGarrison") end,
+	headerSort = DataStore.GetGarrisonResources,
+	
+	-- Content
+	Width = 80,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local uncollected = DataStore:GetUncollectedResources(character) or 0
+			local amount = DataStore:GetCurrencyTotals(character, CURRENCY_ID_GARRISON) or 0
+			local color = (amount == 0) and colors.grey or colors.white
+			local colorUncollected
+			
+			if uncollected <= 300 then
+				colorUncollected = colors.green
+			elseif uncollected < 450 then
+				colorUncollected = colors.yellow
+			else
+				colorUncollected = colors.red
+			end
+
+			return format("%s%s/%s+%s", color, amount, colorUncollected , uncollected)
+		end,
+	OnEnter = function(frame)
+			local character = frame:GetParent().character
+			if not character or not DataStore:GetModuleLastUpdateByKey("DataStore_Garrisons", character) then
+				return
+			end
+			
+			local amount = DataStore:GetCurrencyTotals(character, CURRENCY_ID_GARRISON) or 0
+			local uncollected = DataStore:GetUncollectedResources(character) or 0
+			
+			local tt = AltoTooltip
+			tt:ClearLines()
+			tt:SetOwner(frame, "ANCHOR_RIGHT")
+			tt:AddDoubleLine(DataStore:GetColoredCharacterName(character), L["Garrison resources"])
+			tt:AddLine(" ")
+			tt:AddLine(format("%s: %s%s", L["Garrison resources"], colors.green, amount),1,1,1)
+			tt:AddLine(format("%s: %s%s", L["Uncollected resources"], colors.green, uncollected),1,1,1)
+			
+			local lastVisit = DataStore:GetLastResourceCollectionTime(character)
+			if lastVisit then
+				tt:AddLine(format("%s: %s", L["Last collected"], SecondsToTime(time() - lastVisit)),1,1,1)
+			end
+			
+			if uncollected < 500 then
+				tt:AddLine(" ")
+				
+				-- (resources not yet obtained * 600 seconds)
+				tt:AddLine(format("%s: %s", L["Max. uncollected resources in"], SecondsToTime((500 - uncollected) * 600)),1,1,1)
+			end
+			tt:Show()
+		end,
+}
+--]]
+columns["CurrencyNethershard"] = {
+	-- Header
+	headerWidth = 80,
+	headerLabel = "        " .. format(TEXTURE_FONT, "Interface\\Icons\\inv_datacrystal01", 18, 18),
+	headerOnEnter = function(frame, tooltip)
+			CurrencyHeader_OnEnter(frame, CURRENCY_ID_NETHERSHARD)
+		end,
+	headerOnClick = function() SortView("CurrencyNethershard") end,
+	headerSort = DataStore.GetNethershards,
+	
+	-- Content
+	Width = 100,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local amount = DataStore:GetCurrencyTotals(character, CURRENCY_ID_NETHERSHARD) or 0
+			local color = (amount == 0) and colors.grey or colors.white
+				
+			return format("%s%s", color, amount)
+		end,
+}
+
+columns["CurrencyWarSupplies"] = {
+	-- Header
+	headerWidth = 80,
+	headerLabel = "   " .. format(TEXTURE_FONT, "Interface\\Icons\\inv_misc_summonable_boss_token", 18, 18),
+	headerOnEnter = function(frame, tooltip)
+			CurrencyHeader_OnEnter(frame, CURRENCY_ID_LFWS)
+		end,
+	headerOnClick = function() SortView("CurrencyWarSupplies") end,
+	headerSort = DataStore.GetWarSupplies,
+	
+	-- Content
+	Width = 60,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local amount, _, _, totalMax = DataStore:GetCurrencyTotals(character, CURRENCY_ID_LFWS)
+			local color = (amount == 0) and colors.grey or colors.white
+			
+			return format("%s%s%s/%s%s", color, amount, colors.white, colors.yellow, totalMax)
+		end,
+}
+
+columns["CurrencySOBF"] = {
+	-- Header
+	headerWidth = 60,
+	headerLabel = "   " .. format(TEXTURE_FONT, "Interface\\Icons\\inv_misc_elvencoins", 18, 18),
+	headerOnEnter = function(frame, tooltip)
+			CurrencyHeader_OnEnter(frame, CURRENCY_ID_SOBF)
+		end,
+	headerOnClick = function() SortView("CurrencySOBF") end,
+	headerSort = DataStore.GetSealsOfBrokenFate,
+	
+	-- Content
+	Width = 60,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local amount, _, _, totalMax = DataStore:GetCurrencyTotals(character, CURRENCY_ID_SOBF)
+			local color = (amount == 0) and colors.grey or colors.white
+			
+			return format("%s%s%s/%s%s", color, amount, colors.white, colors.yellow, totalMax)
+		end,
+}
+
 columns["CurrencyOrderHall"] = {
 	-- Header
 	headerWidth = 80,
@@ -1544,176 +1667,6 @@ columns["CurrencyOrderHall"] = {
 --			tt:Show()
 --		end,
 }
-
-columns["CurrencyNethershard"] = {
-	-- Header
-	headerWidth = 80,
-	headerLabel = "        " .. format(TEXTURE_FONT, "Interface\\Icons\\inv_datacrystal01", 18, 18),
-	headerOnEnter = function(frame, tooltip)
-			CurrencyHeader_OnEnter(frame, CURRENCY_ID_NETHERSHARD)
-		end,
-	headerOnClick = function() SortView("CurrencyNethershard") end,
-	headerSort = DataStore.GetNethershards,
-	
-	-- Content
-	Width = 100,
-	JustifyH = "CENTER",
-	GetText = function(character)
-			local amount = DataStore:GetCurrencyTotals(character, CURRENCY_ID_NETHERSHARD) or 0
-			local color = (amount == 0) and colors.grey or colors.white
-				
-			return format("%s%s", color, amount)
-		end,
-}
-
-columns["CurrencySOBF"] = {
-	-- Header
-	headerWidth = 60,
-	headerLabel = "   " .. format(TEXTURE_FONT, "Interface\\Icons\\inv_misc_elvencoins", 18, 18),
-	headerOnEnter = function(frame, tooltip)
-			CurrencyHeader_OnEnter(frame, CURRENCY_ID_SOBF)
-		end,
-	headerOnClick = function() SortView("CurrencySOBF") end,
-	headerSort = DataStore.GetSealsOfBrokenFate,
-	
-	-- Content
-	Width = 60,
-	JustifyH = "CENTER",
-	GetText = function(character)
-			local amount, _, _, totalMax = DataStore:GetCurrencyTotals(character, CURRENCY_ID_SOBF)
-			local color = (amount == 0) and colors.grey or colors.white
-			
-			return format("%s%s%s/%s%s", color, amount, colors.white, colors.yellow, totalMax)
-		end,
-}
-
-columns["CurrencyWarSupplies"] = {
-	-- Header
-	headerWidth = 80,
-	headerLabel = "   " .. format(TEXTURE_FONT, "Interface\\Icons\\inv_misc_summonable_boss_token", 18, 18),
-	headerOnEnter = function(frame, tooltip)
-			CurrencyHeader_OnEnter(frame, CURRENCY_ID_LFWS)
-		end,
-	headerOnClick = function() SortView("CurrencyWarSupplies") end,
-	headerSort = DataStore.GetWarSupplies,
-	
-	-- Content
-	Width = 60,
-	JustifyH = "CENTER",
-	GetText = function(character)
-			local amount, _, _, totalMax = DataStore:GetCurrencyTotals(character, CURRENCY_ID_LFWS)
-			local color = (amount == 0) and colors.grey or colors.white
-			
-			return format("%s%s%s/%s%s", color, amount, colors.white, colors.yellow, totalMax)
-		end,
-}
-
---[[ Old: Garrison Resources
-columns["CurrencyGarrison"] = {
-	-- Header
-	headerWidth = 80,
-	headerLabel = format("  %s  6.0", format(TEXTURE_FONT, "Interface\\Icons\\inv_garrison_resource", 18, 18)),
-	headerOnEnter = function(frame, tooltip)
-			CurrencyHeader_OnEnter(frame, CURRENCY_ID_GARRISON)
-		end,
-	headerOnClick = function() SortView("CurrencyGarrison") end,
-	headerSort = DataStore.GetGarrisonResources,
-	
-	-- Content
-	Width = 80,
-	JustifyH = "CENTER",
-	GetText = function(character)
-			local uncollected = DataStore:GetUncollectedResources(character) or 0
-			local amount = DataStore:GetCurrencyTotals(character, CURRENCY_ID_GARRISON) or 0
-			local color = (amount == 0) and colors.grey or colors.white
-			local colorUncollected
-			
-			if uncollected <= 300 then
-				colorUncollected = colors.green
-			elseif uncollected < 450 then
-				colorUncollected = colors.yellow
-			else
-				colorUncollected = colors.red
-			end
-
-			return format("%s%s/%s+%s", color, amount, colorUncollected , uncollected)
-		end,
-	OnEnter = function(frame)
-			local character = frame:GetParent().character
-			if not character or not DataStore:GetModuleLastUpdateByKey("DataStore_Garrisons", character) then
-				return
-			end
-			
-			local amount = DataStore:GetCurrencyTotals(character, CURRENCY_ID_GARRISON) or 0
-			local uncollected = DataStore:GetUncollectedResources(character) or 0
-			
-			local tt = AltoTooltip
-			tt:ClearLines()
-			tt:SetOwner(frame, "ANCHOR_RIGHT")
-			tt:AddDoubleLine(DataStore:GetColoredCharacterName(character), L["Garrison resources"])
-			tt:AddLine(" ")
-			tt:AddLine(format("%s: %s%s", L["Garrison resources"], colors.green, amount),1,1,1)
-			tt:AddLine(format("%s: %s%s", L["Uncollected resources"], colors.green, uncollected),1,1,1)
-			
-			local lastVisit = DataStore:GetLastResourceCollectionTime(character)
-			if lastVisit then
-				tt:AddLine(format("%s: %s", L["Last collected"], SecondsToTime(time() - lastVisit)),1,1,1)
-			end
-			
-			if uncollected < 500 then
-				tt:AddLine(" ")
-				
-				-- (resources not yet obtained * 600 seconds)
-				tt:AddLine(format("%s: %s", L["Max. uncollected resources in"], SecondsToTime((500 - uncollected) * 600)),1,1,1)
-			end
-			tt:Show()
-		end,
-}
---]]
---[[ Old: Apexis Crystals
-columns["CurrencyApexis"] = {
-	-- Header
-	headerWidth = 100,
-	headerLabel = "        " .. format(TEXTURE_FONT, "Interface\\Icons\\inv_apexis_draenor", 18, 18),
-	headerOnEnter = function(frame, tooltip)
-			CurrencyHeader_OnEnter(frame, CURRENCY_ID_APEXIS)
-		end,
-	headerOnClick = function() SortView("CurrencyApexis") end,
-	headerSort = DataStore.GetApexisCrystals,
-	
-	-- Content
-	Width = 100,
-	JustifyH = "CENTER",
-	GetText = function(character)
-			local amount = DataStore:GetCurrencyTotals(character, CURRENCY_ID_APEXIS) or 0
-			local color = (amount == 0) and colors.grey or colors.white
-				
-			return format("%s%s", color, amount)
-		end,
-}
---]]
---[[ Old: Seal of Tempered Fate
-columns["CurrencySOTF"] = {
-	-- Header
-	headerWidth = 60,
-	headerLabel = "   " .. format(TEXTURE_FONT, "Interface\\Icons\\ability_animusorbs", 18, 18),
-	headerOnEnter = function(frame, tooltip)
-			CurrencyHeader_OnEnter(frame, CURRENCY_ID_SOTF)
-		end,
-	headerOnClick = function() SortView("CurrencySOTF") end,
-	headerSort = DataStore.GetSealsOfFate,
-	
-	-- Content
-	Width = 60,
-	JustifyH = "CENTER",
-	GetText = function(character)
-			local amount, _, _, totalMax = DataStore:GetCurrencyTotals(character, CURRENCY_ID_SOTF)
-			local color = (amount == 0) and colors.grey or colors.white
-			
-			return format("%s%s%s/%s%s", color, amount, colors.white, colors.yellow, totalMax)
-		end,
-}
---]]
 
 
 -- ** Garrison Followers **
@@ -2018,7 +1971,6 @@ columns["FollowersItems"] = {
 --		end,
 --}
 
-
 local function ColumnHeader_OnEnter(frame)
 	local column = frame.column
 	if not frame.column then return end		-- invalid data ? exit
@@ -2049,7 +2001,7 @@ end
 local modes = {
 	[MODE_SUMMARY] = { "Name", "Level", "RestXP", "Money", "Played", "AiL", "LastOnline" },
 	[MODE_BAGS] = { "Name", "Level", "BagSlots", "FreeBagSlots", "BankSlots", "FreeBankSlots" },
---	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFishing", "ProfArchaeology" },
+	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFishing", "ProfArchaeology" },
 	[MODE_ACTIVITY] = { "Name", "Level", "Mails", "LastMailCheck", "Auctions", "Bids", "AHLastVisit", "MissionTableLastVisit" },
 	[MODE_CURRENCIES] = { "Name", "Level", "CurrencyOrderHall", "CurrencyNethershard", "CurrencyWarSupplies", "CurrencySOBF", },
 	[MODE_FOLLOWERS] = { "Name", "Level", "FollowersLV100", "FollowersEpic", "FollowersLV630", "FollowersLV660", "FollowersLV675", "FollowersItems" },
@@ -2167,13 +2119,14 @@ function addon:AiLTooltip()
 	local tt = AltoTooltip
 	
 	tt:AddLine(" ")
-	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME0), FormatAiL("60-92"))
-	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME1), FormatAiL("115-154"))
-	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME2), FormatAiL("200-284"))
-	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME3), FormatAiL("333-372"))
-	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME4), FormatAiL("358-530"))
-	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME5), FormatAiL("550-720+"))
-	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME6), FormatAiL("805-900+"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME0), FormatAiL("1-62"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME1), FormatAiL("63-94"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME2), FormatAiL("95-102"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME3), FormatAiL("103-114"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME4), FormatAiL("115-130"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME5), FormatAiL("131-149"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME6), FormatAiL("150-265"))
+	tt:AddDoubleLine(format("%s%s", colors.teal, EXPANSION_NAME7), FormatAiL("266+"))
 	
 	-- tt:AddLine(colors.teal .. L["Level"] .. " 90",1,1,1);
 	-- tt:AddDoubleLine(colors.yellow .. "358", format("%s%s: %s", colors.white, CALENDAR_TYPE_DUNGEON, PLAYER_DIFFICULTY1))
