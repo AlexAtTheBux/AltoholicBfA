@@ -50,7 +50,9 @@ local AddonDB_Defaults = {
 local ReferenceDB_Defaults = {
 	global = {
 		Reagents = {},		-- [recipeID] = "itemID1,count1 | itemID2,count2 | ..."
-		ResultItems = {}	-- [recipeID] = itemID
+		ResultItems = {},	-- [recipeID] = itemID
+		Recipes = {},		-- [recipeID] = 
+		RecipeCategoryNames = {},		-- [categoryID] = name
 	}
 }
 
@@ -68,6 +70,7 @@ local SPELL_ID_MINING = 2575
 local SPELL_ID_HERBALISM = 2366
 local SPELL_ID_SMELTING = 2656
 local SPELL_ID_COOKING = 2550
+local SPELL_ID_FIRSTAID = 3273
 local SPELL_ID_FISHING = 131474
 local SPELL_ID_ARCHAEOLOGY = 78670
 
@@ -87,6 +90,7 @@ local ProfessionSpellID = {
 	["Smelting"] = SPELL_ID_SMELTING,
 
 	["Cooking"] = SPELL_ID_COOKING,
+	["First Aid"] = SPELL_ID_FIRSTAID,
 	["Fishing"] = SPELL_ID_FISHING,
 }
 
@@ -202,12 +206,13 @@ local function ScanProfessionInfo(index, mainIndex)
 
 	if not char or not index then return end
 	
-	local profName, texture, rank, maxRank = GetProfessionInfo(index);
+	local profName, texture, rank, maxRank, _, _, _, _, _, _, currentLevelName = GetProfessionInfo(index);
 	local profession = char.Professions[profName]
 	profession.Rank = rank
 	profession.MaxRank = maxRank
+	profession.CurrentLevelName = currentLevelName
 	
-	local profLink = GetSpellLink(profName)
+	local profLink = select(2, GetSpellLink(profName))
 	if profLink then	-- sometimes a nil value may be returned, so keep the old one if nil
 		profession.FullLink = profLink
 	end
@@ -218,10 +223,9 @@ local function ScanProfessionInfo(index, mainIndex)
 end
 
 local function ScanProfessionLinks()
-	local prof1, prof2, arch, fish, cook, firstAid = GetProfessions()
+	local prof1, prof2, arch, fish, cook = GetProfessions()
 
 	ScanProfessionInfo(cook)
-	ScanProfessionInfo(firstAid)
 	ScanProfessionInfo(fish)
 	ScanProfessionInfo(arch)
 	ScanProfessionInfo(prof1, 1)
@@ -237,12 +241,51 @@ local SkillTypeToColor = {
 	["optimal"] = 3,		-- orange
 }
 
+local function ScanRecipeCategories(profession)
+	-- clear storage
+	profession.Categories = profession.Categories or {}
+	wipe(profession.Categories)
+	
+	local names = addon.ref.global.RecipeCategoryNames
+	
+	-- loop through this profession's categories
+	for _, id in ipairs( { C_TradeSkillUI.GetCategories() } ) do
+		local info = C_TradeSkillUI.GetCategoryInfo(id)
+   
+		if info.hasProgressBar == true then
+			names[info.categoryID] = info.name
+		
+			-- save the names of subcategories
+			local subCats = { C_TradeSkillUI.GetSubCategories(info.categoryID) }
+			for _, subCatID in pairs(subCats) do
+				local subCatInfo = C_TradeSkillUI.GetCategoryInfo(subCatID)
+				
+				names[subCatInfo.categoryID] = subCatInfo.name
+			end
+		
+			table.insert(profession.Categories, { 
+				id = info.categoryID, 
+				Rank = info.skillLineCurrentLevel, 
+				MaxRank = info.skillLineMaxLevel,
+				SubCategories = subCats
+			})
+		end
+	end
+end
+
 local function ScanRecipes()
-	local _, tradeskillName = C_TradeSkillUI.GetTradeSkillLine()
+	print("scan recipes")
+	local tradeskillName = select(7, C_TradeSkillUI.GetTradeSkillLine())
 	if not tradeskillName or tradeskillName == "UNKNOWN" then return end	-- may happen after a patch, or under extreme lag, so do not save anything to the db !
 
 	local char = addon.ThisCharacter
 	local profession = char.Professions[tradeskillName]
+	
+	ScanRecipeCategories(profession)
+	
+	local zz = 0
+	if zz == 0 then return end
+	
 	local crafts = profession.Crafts
 	wipe(crafts)
 	
@@ -254,6 +297,9 @@ local function ScanRecipes()
 	
 	local resultItems = addon.ref.global.ResultItems
 	local reagentsDB = addon.ref.global.Reagents
+	
+	addon.ref.global.Recipes[tradeskillName] = addon.ref.global.Recipes[tradeskillName] or {}
+	local recipesDB = addon.ref.global.Recipes[tradeskillName]
 	local reagentsInfo = {}
 	
 	for i, recipeID in pairs(recipes) do
@@ -308,6 +354,8 @@ local function ScanRecipes()
 	addon:SendMessage("DATASTORE_RECIPES_SCANNED", char, tradeskillName)
 end
 
+
+
 local function ScanTradeSkills()
 	ScanRecipes()
 	-- ScanCooldowns()
@@ -354,7 +402,7 @@ end
 
 local function OnTradeSkillClose()
 	addon:UnregisterEvent("TRADE_SKILL_CLOSE")
-	addon:UnregisterEvent("TRADE_SKILL_UPDATE")
+	-- addon:UnregisterEvent("TRADE_SKILL_UPDATE")
 	addon.isOpen = nil
 end
 
@@ -373,7 +421,7 @@ local function OnTradeSkillShow()
 	
 	addon:RegisterEvent("TRADE_SKILL_CLOSE", OnTradeSkillClose)
 	-- we are not interested in this event if the TS pane is not shown.
-	addon:RegisterEvent("TRADE_SKILL_UPDATE", OnTradeSkillUpdate)	
+	-- addon:RegisterEvent("TRADE_SKILL_UPDATE", OnTradeSkillUpdate)	
 	addon.isOpen = true
 end
 
@@ -467,7 +515,7 @@ local function _GetProfessionInfo(profession)
 		link = profession
 	end
 	
-	if link then
+	if link and type(link) ~= "number" then
 		-- _, spellID, rank, maxRank = link:match("trade:(%w+):(%d+):(%d+):(%d+):")
 		_, spellID = link:match("trade:(%w+):(%d+)")		-- Fix 5.4, rank no longer in the profession link
 	end
@@ -696,8 +744,9 @@ function addon:OnEnable()
 	local _, _, arch = GetProfessions()
 
 	if arch then
-		addon:RegisterEvent("RESEARCH_ARTIFACT_HISTORY_READY", OnArtifactHistoryReady)
-		addon:RegisterEvent("RESEARCH_ARTIFACT_COMPLETE", OnArtifactComplete)
+		--	ARTIFACT_HISTORY_READY deprecated in 8.0
+		-- addon:RegisterEvent("ARTIFACT_HISTORY_READY", OnArtifactHistoryReady)
+		-- addon:RegisterEvent("ARTIFACT_COMPLETE", OnArtifactComplete)
 		RequestArtifactCompletionHistory()		-- this will trigger ARTIFACT_HISTORY_READY
 	end
 	

@@ -37,7 +37,7 @@ local AddonDB_Defaults = {
 				playedThisLevel = 0,	-- /played at this level, in seconds
 				zone = nil,				-- character location
 				subZone = nil,
-        
+				
 				-- ** XP **
 				XP = nil,				-- current level xp
 				XPMax = nil,			-- max xp at current level 

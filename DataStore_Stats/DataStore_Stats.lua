@@ -71,15 +71,16 @@ local function ScanStats()
 	t[5] = GetCombatRating(CR_HASTE_SPELL)
 	t[6] = floor(GetManaRegen() * 5.0)
 	stats["Spell"] = table.concat(t, "|")	--	["Spell"] = "+Damage | +Healing | Hit | Crit chance | Haste | Mana Regen"
-	
+		
 	-- *** defenses stats ***
 	t[1] = UnitArmor("player")
-	t[2] = GetDodgeChance()
-	t[3] = GetParryChance()
-	t[4] = GetBlockChance()
-	t[5] = GetCombatRating(COMBAT_RATING_RESILIENCE_PLAYER_DAMAGE_TAKEN)
-  t[6] = nil
-	stats["Defense"] = table.concat(t, "|")	--	["Defense"] = "Armor | Dodge | Parry | Block | Resilience"
+	-- t[2] = UnitDefense("player")	deprecated in 8.0
+	t[2] = 0
+	t[3] = GetDodgeChance()
+	t[4] = GetParryChance()
+	t[5] = GetBlockChance()
+	t[6] = GetCombatRating(COMBAT_RATING_RESILIENCE_PLAYER_DAMAGE_TAKEN)
+	stats["Defense"] = table.concat(t, "|")	--	["Defense"] = "Armor | Defense | Dodge | Parry | Block | Resilience"
 
 	-- *** PVP Stats ***
 	t[1], t[2] = GetPVPLifetimeStats()
