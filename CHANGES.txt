@@ -5,10 +5,10 @@ Altoholic\Loots.lua:
 	
 Altoholic_Achievements\Frames\Achievements.lua:
 	FIXED:		Ashran & Strand of the Ancients are no longer Achievement categories
-	ENHANCED:	Organized Argus quest achievements
-	ENHANCED:	Organized Argus exploration achievements
-	ENHANCED:	Organized new Honor achievements
-	ENHANCED:	Organized all Legion dungeon and raid achievements by boss
+	ENHANCED:	organized Argus quest achievements
+	ENHANCED:	organized Argus exploration achievements
+	ENHANCED:	organized new Honor achievements
+	ENHANCED:	organized all Legion dungeon and raid achievements by boss
 	
 Altoholic_Agenda\Frames\Calendar.lua:
 Altoholic_Agenda\Frames\Calendar.xnl:
@@ -22,6 +22,7 @@ Altoholic_Search\TabSearch.xml:
 	FIXED:		character level search boxes now accept three-digit values
 	
 Altoholic_Summary:
+	FIXED:		currency link now requires an amount (using 0 to bypass)
 	TEMP FIX:	removed the Artifacts summary as it is now useless
 	TEMP FIX:	removed the Tradeskills summary as it is currently broken
 	UPDATED:	item level ranges now account for the squish
@@ -30,10 +31,10 @@ DataStore_Agenda\DataStore_Agenda.lua:
 	FIXED:		use new C_Calendar API functions
 	
 DataStore_Inventory\DataStore_Inventory.lua:
-	FIXED:		Transmog sets that are armor type-specific will now show completion for all classes of that armor type
+	FIXED:		transmog sets that are armor type-specific will now show completion for all classes of that armor type
 
 DataStore_Quests\DataStore_Quests.lua:
-	ENHANCED:	Paragon quests are no longer tracked, as they are repeatable non-daily quests
+	ENHANCED:	paragon quests are no longer tracked, as they are repeatable non-daily quests
 	
 DataStore_Reputations\DataStore_Reputations.lua:
 	ADDED:		Legion Fishing Master reputations
