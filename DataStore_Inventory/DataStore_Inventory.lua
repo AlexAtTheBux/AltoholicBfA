@@ -288,14 +288,14 @@ local function OnPlayerEquipmentChanged(event, slot)
 	addon.ThisCharacter.lastUpdate = time()
 end
 
-local function OnPlayerAilReady()
-	ScanAverageItemLevel()
-end
+--local function OnPlayerAilReady()
+--	ScanAverageItemLevel()
+--end
 
-local function OnTransmogCollectionLoaded()
-	ScanTransmogCollection()
-	ScanTransmogSets()
-end
+--local function OnTransmogCollectionLoaded()
+--	ScanTransmogCollection()
+--	ScanTransmogSets()
+--end
 
 local function OnTransmogCollectionUpdated()
 	ScanTransmogCollection()
@@ -510,7 +510,7 @@ function addon:OnEnable()
 	addon:RegisterEvent("PLAYER_ALIVE", OnPlayerAlive)
 	addon:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", OnPlayerEquipmentChanged)
 --	addon:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_READY", OnPlayerAilReady)
-	addon:RegisterEvent("TRANSMOG_COLLECTION_LOADED", OnTransmogCollectionLoaded)
+--	addon:RegisterEvent("TRANSMOG_COLLECTION_LOADED", OnTransmogCollectionLoaded)
 	addon:RegisterEvent("TRANSMOG_COLLECTION_UPDATED", OnTransmogCollectionUpdated)
 	
 	addon:SetupOptions()

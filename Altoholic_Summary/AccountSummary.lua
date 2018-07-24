@@ -480,12 +480,12 @@ columns["Name"] = {
 				tt:AddLine(format("%s: %s%s", GUILD, colors.green, guildName),1,1,1)
 			end
 
-			local suggestion = addon:GetSuggestion("Leveling", DataStore:GetCharacterLevel(character))
-			if suggestion then
-				tt:AddLine(" ")
-				tt:AddLine(L["Suggested leveling zone: "],1,1,1)
-				tt:AddLine(colors.teal .. suggestion,1,1,1)
-			end
+--			local suggestion = addon:GetSuggestion("Leveling", DataStore:GetCharacterLevel(character))
+--			if suggestion then
+--				tt:AddLine(" ")
+--				tt:AddLine(L["Suggested leveling zone: "],1,1,1)
+--				tt:AddLine(colors.teal .. suggestion,1,1,1)
+--			end
 
 			-- parse saved instances
 			local bLineBreak = true

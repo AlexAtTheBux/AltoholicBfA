@@ -1,14 +1,13 @@
 All changes listed are considered part of a "Fan Update":
 
+Altoholic\Locales\enUS.lua
+	ADDED:		localization string for Fishing Masters
 Altoholic\Loots.lua:
 	FIXED:		use new mapIDs
 	
 Altoholic_Achievements\Frames\Achievements.lua:
-	FIXED:		Ashran & Strand of the Ancients are no longer Achievement categories
-	ENHANCED:	organized Argus quest achievements
-	ENHANCED:	organized Argus exploration achievements
-	ENHANCED:	organized new Honor achievements
-	ENHANCED:	organized all Legion dungeon and raid achievements by boss
+	FIXED:		removed invalid Category IDs
+	ENHANCED:	organized several categories (more might be organized later)
 	
 Altoholic_Agenda\Frames\Calendar.lua:
 Altoholic_Agenda\Frames\Calendar.xnl:
@@ -25,6 +24,7 @@ Altoholic_Summary:
 	FIXED:		currency link now requires an amount (using 0 to bypass)
 	TEMP FIX:	removed the Artifacts summary as it is now useless
 	TEMP FIX:	removed the Tradeskills summary as it is currently broken
+	TEMP FIX:	removed the summary tooltip as it is currently broken
 	UPDATED:	item level ranges now account for the squish
 	
 DataStore_Agenda\DataStore_Agenda.lua:
@@ -32,6 +32,7 @@ DataStore_Agenda\DataStore_Agenda.lua:
 	
 DataStore_Inventory\DataStore_Inventory.lua:
 	FIXED:		transmog sets that are armor type-specific will now show completion for all classes of that armor type
+	FIXED:		PLAYER_AVG_ITEM_LEVEL_READY and TRANSMOG_COLLECTION_LOADED are no longer valid events
 
 DataStore_Quests\DataStore_Quests.lua:
 	ENHANCED:	paragon quests are no longer tracked, as they are repeatable non-daily quests

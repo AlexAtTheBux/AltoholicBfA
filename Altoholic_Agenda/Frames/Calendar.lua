@@ -48,9 +48,9 @@ addon:Controller("AltoholicUI.Calendar", {
 	Update = function(frame)
 		-- taken from CalendarFrame_Update() in Blizzard_Calendar.lua, adjusted for my needs.
 		
-    local cMonth = C_Calendar.MonthInfo()
-    local nMonth = C_Calendar.MonthInfo(1)
-    local lMonth = C_Calendar.MonthInfo(-1)
+    local cMonth = C_Calendar.GetMonthInfo()
+    local nMonth = C_Calendar.GetMonthInfo(1)
+    local lMonth = C_Calendar.GetMonthInfo(-1)
     local today  = C_Calendar.GetDate()
 		local presentWeekday, presentMonth, presentDay, presentYear = today.weekday, today.month, today.monthDay, today.year
 		local prevMonth, prevYear, prevNumDays = lMonth.month, lMonth.year, lMonth.numDays
